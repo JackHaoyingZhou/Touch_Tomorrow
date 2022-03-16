@@ -38,7 +38,7 @@ class razer_Device:
                                                 msg.paddles[0].transform.rotation.y,
                                                 msg.paddles[0].transform.rotation.z,
                                                 msg.paddles[0].transform.rotation.w])
-            self.base_mtx_left = mtx_left.as_dcm()
+            self.base_mtx_left = mtx_left.as_matrix()
             self.base_pos_left = [msg.paddles[0].transform.translation.x,
                                   msg.paddles[0].transform.translation.y,
                                   msg.paddles[0].transform.translation.z]
@@ -49,7 +49,7 @@ class razer_Device:
                                       msg.paddles[1].transform.rotation.y,
                                       msg.paddles[1].transform.rotation.z,
                                       msg.paddles[1].transform.rotation.w])
-            self.base_mtx_right = mtx_right.as_dcm()
+            self.base_mtx_right = mtx_right.as_matrix()
             self.base_pos_right = [msg.paddles[1].transform.translation.x,
                                   msg.paddles[1].transform.translation.y,
                                   msg.paddles[1].transform.translation.z]
@@ -79,7 +79,7 @@ class razer_Device:
                                   msg_right.rotation.y,
                                   msg_right.rotation.z,
                                   msg_right.rotation.w])
-        return pos_left, pos_right, rot_left.as_dcm(), rot_right.as_dcm()
+        return pos_left, pos_right, rot_left.as_matrix(), rot_right.as_matrix()
 
     def pose_cb(self, msg):
         self._active = True
@@ -92,8 +92,8 @@ class razer_Device:
             pose_left.append(pos_left[i_index])
             pose_right.append(pos_right[i_index])
 
-        mtx_left = Rot.from_dcm(np.dot(np.transpose(self.base_mtx_left),rot_left))
-        mtx_right = Rot.from_dcm(np.dot(np.transpose(self.base_mtx_right), rot_right))
+        mtx_left = Rot.from_matrix(np.dot(np.transpose(self.base_mtx_left),rot_left))
+        mtx_right = Rot.from_matrix(np.dot(np.transpose(self.base_mtx_right), rot_right))
 
         ori_left = mtx_left.as_euler('xyz',degrees=False)
         ori_right = mtx_right.as_euler('xyz',degrees=False)
