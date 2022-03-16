@@ -18,6 +18,8 @@ class razer_Device:
         self._active = False
         self._scale = [1.0, 1.0, 1.0]
         self.jaw_scale = 1.0
+        self.clutch_left = 1
+        self.clutch_right = 1
         self.base_mtx_left = np.eye(3)
         self.base_mtx_right = np.eye(3)
         self.base_pos_left = [0.0,0.0,0.0]
@@ -55,6 +57,18 @@ class razer_Device:
                                   msg.paddles[1].transform.translation.z]
             self.reset_button = True
 
+    def get_clutch(self, msg):
+        if msg.paddles[0].buttons[5] == True:
+            time.sleep(0.2)
+            if msg.paddles[0].buttons[5] == True:
+                self.clutch_left = -1*self.clutch_left
+
+        if msg.paddles[1].buttons[5] == True:
+            time.sleep(0.2)
+            if msg.paddles[1].buttons[5] == True:
+                self.clutch_right = -1*self.clutch_right
+
+
     def set_scale(self, scale):
         self._scale = scale
 
@@ -85,6 +99,7 @@ class razer_Device:
         self._active = True
         pose_left = []
         pose_right = []
+        self.get_clutch(msg)
         pos_left, pos_right, rot_left, rot_right = self.hydra_msg_read(msg)
         for i_index in range(3):
             pos_left[i_index] = self._scale[i_index] * (pos_left[i_index] - self.base_pos_left[i_index])
@@ -102,23 +117,27 @@ class razer_Device:
             pose_left.append(ori_left[j_index])
             pose_right.append(ori_right[j_index])
 
+        
+
         self.pose_left = pose_left
         self.pose_right = pose_right
         self.jaw_left = self.jaw_scale * msg.paddles[0].trigger
         self.jaw_right = self.jaw_scale * msg.paddles[1].trigger
 
     def get_hydra_data(self):
-        return self.pose_left, self.pose_right, self.jaw_left, self.jaw_right
+        return self.pose_left, self.pose_right, self.jaw_left, self.jaw_right, self.clutch_left, self.clutch_right
 
     def sub_pub(self, feq):
         rate = rospy.Rate(feq)
         while not rospy.is_shutdown():
-            pose_left, pose_right, jaw_left, jaw_right = self.get_hydra_data()
+            pose_left, pose_right, jaw_left, jaw_right,clutch_left, clutch_right = self.get_hydra_data()
             pub_data = hydraData()
             pub_data.poseLeft = pose_left
             pub_data.poseRight = pose_right
             pub_data.jawLeft = jaw_left
             pub_data.jawRight = jaw_right
+            pub_data.clutchLeft = clutch_left
+            pub_data.clutchRight = clutch_right
             self.pub_topic.publish(pub_data)
             rate.sleep()
 
