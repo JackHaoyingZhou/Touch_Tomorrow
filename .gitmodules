@@ -1,0 +1,3 @@
+[submodule "src/razer_hydra"]
+	path = src/razer_hydra
+	url = https://github.com/JackHaoyingZhou/razer_hydra.git
