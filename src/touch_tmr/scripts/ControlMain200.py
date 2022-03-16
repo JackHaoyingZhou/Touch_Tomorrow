@@ -35,12 +35,12 @@ class ArmSideControl:
     E_start = 0
     E_end = 0
     E_data = 0
-    Count_E = 1
-    vtec_flag = False
+    clutch = 1
     def get_data(self,data):
+        self.clutch = int(data.clutchRight)
         self.E_data = float(data.jawRight)
-        self.V_data.p = pk.Vector(float(data.poseRight[1])*0.38,
-                                  float(data.poseRight[0])*0.4537,
+        self.V_data.p = pk.Vector(float(data.poseRight[1])*-0.19,
+                                  float(data.poseRight[0])*-0.226,
                                   float(data.poseRight[2])*0.25)
         self.V_data.M = pk.Rotation.EulerZYX(float(data.poseRight[5]),
                                              float(data.poseRight[3]),  
@@ -93,7 +93,6 @@ class ArmSideControl:
             # Use flag and count to determine wether should update data or move to next waypoint
             #ts = time.time()
             goal_jaw = self.E_data - self.E_start
-            goal_jaw = self.E_start + (self.step_E * self.Count_E)
             self.move_jaw(goal_jaw)
             self.step_p = (self.V_data.p + self.V_ori.p - self.V_start.p)
             if abs(self.step_p[0]) > 0.002:
@@ -118,8 +117,6 @@ class ArmSideControl:
                     flag = 1
                 if abs(step) > 0.17:
                     step = flag * 0.17
-
-
             self.goal_arm = self.V_start
             self.goal_arm.p = self.goal_arm.p + (self.step_p * self.Count_V)
             self.goal_arm.p = pk.Vector(round(self.goal_arm.p[0],6),round(self.goal_arm.p[1],6),round(self.goal_arm.p[2],6))
