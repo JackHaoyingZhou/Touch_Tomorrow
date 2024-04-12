@@ -59,14 +59,18 @@ class razer_Device:
 
     def get_clutch(self, msg):
         if msg.paddles[0].buttons[5] == True:
-            time.sleep(0.2)
+            time.sleep(0.1)
             if msg.paddles[0].buttons[5] == True:
-                self.clutch_left = -1*self.clutch_left
+                time.sleep(0.08)
+                if msg.paddles[0].buttons[5] == True:
+                    self.clutch_left = -1*self.clutch_left
 
         if msg.paddles[1].buttons[5] == True:
-            time.sleep(0.2)
+            time.sleep(0.1)
             if msg.paddles[1].buttons[5] == True:
-                self.clutch_right = -1*self.clutch_right
+                time.sleep(0.08)
+                if msg.paddles[1].buttons[5] == True:
+                    self.clutch_right = -1*self.clutch_right
 
 
     def set_scale(self, scale):
